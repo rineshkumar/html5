@@ -1,0 +1,24 @@
+<html>
+    <body>
+            Check console 
+    </body>
+    <script> 
+    const messageChannel = new MessageChannel();
+    messageChannel.port1.onmessage=(e ) => {
+        console.log("received message on port1 : "+e.data)
+    }
+    messageChannel.port2.onmessage = (e) =>{
+        console.log("received message on port 2 :"+e.data)
+    }
+    messageChannel.port1.addEventListener("show-message",()=>{
+        console.log("Show message event occured ")
+    })
+    setInterval(() => {
+        messageChannel.port1.postMessage("Hello From port 2 "+Date.now());
+        messageChannel.port1.dispatchEvent(new Event("show-message"))
+    }, 2000);
+    setInterval(() => {
+        messageChannel.port2.postMessage("Hello From port 1 "+Date.now());
+    }, 2000);
+    </script>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>Big for loop</title>
+
+    <script>
+        // var worker = new Worker(() => {
+        //     for (var i = 0; i <= 10000; i += 1) {
+        //         var j = i;
+        //     }
+        //     postMessage(j);
+        // });
+        var worker = new Worker("bigloop.js");
+        worker.onmessage = function (event) {
+            alert("Completed " + event.data + "iterations");
+        };
+        worker.onerror = function (event) {
+            console.log(event.message, event);
+        };
+        //Checking browser support 
+        // if (Modernizr.webworkers) {
+        //     alert("Congratulation!! you have web workers support.");
+        // } else {
+        //     alert("Sorry!! you do not have web workers support.");
+        // }
+
+        //worker.terminate();
+        //Terminating web worker 
+        //worker.terminate();
+        function sayHello() {
+            alert("Hello sir....");
+        }
+    </script>
+</head>
+
+<body>
+    <input type="button" onclick="sayHello();" value="Say Hello" />
+</body>
+
+</html>

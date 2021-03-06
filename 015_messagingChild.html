@@ -1,0 +1,13 @@
+<html>
+    <body>
+        Message 
+        <div id="message">........</div>
+    </body>
+    <script>
+        window.addEventListener("message",(event)=>{
+            if(event.origin == 'http://localhost') {
+                document.getElementById("message").innerHTML = event.data
+            }
+        })
+    </script>>
+</html>
