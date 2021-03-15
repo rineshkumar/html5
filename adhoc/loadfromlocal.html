@@ -48,12 +48,25 @@
                 return (url + ((-1 == url.indexOf('?')) ? '?' : '&amp;') + param);
             }
 			function downloadDocument(){
-					 fetch('http://localhost:8080/pdfserver/react.pdf')
+			var myHeaders = new Headers();
+			myHeaders.append('pragma', 'no-cache');
+			myHeaders.append('cache-control', 'no-cache');
+
+			var myInit = {
+			  method: 'GET',
+			  headers: myHeaders,
+			};
+					var myRequest = new Request('http://localhost:8080/pdfserver/react.pdf');
+					 fetch(myRequest, myInit)
 				  .then(resp => resp.blob())
 				  .then(blob => {
+				  //var newBlob = new window.Blob([blob], { type: 'application/pdf' });
 				  //$("#pdffile").data=blob;
-				  const url = window.URL.createObjectURL(blob);
-				  document.getElementById("pdffile").src = url
+				  //For iframe 
+				  const docURL = window.URL.createObjectURL(blob);
+				//  $("#viewer-container").empty();
+				  //$("#viewer-container").append('<embed type="application/pdf" marginheight="0" marginwidth="0" width="100%" height="100%" scrolling="auto" fullscreen=yes data="'+docURL+'"></embed>');	
+				  document.getElementById("pdffile").src = docURL
 					<!-- const url = window.URL.createObjectURL(blob); -->
 					<!-- const a = document.createElement('a'); -->
 					<!-- a.style.display = 'none'; -->
@@ -68,7 +81,9 @@
 						console.log("File Downloaded")
 				  })
 				  )
-				  .catch(() => alert('oh no!'));
+				  .catch((e) => {
+				  console.log("Message : "+e.message)
+				  });
 			}
             function loadDocument() {
 		
@@ -86,8 +101,9 @@
 		<!-- <iframe id="ipmviewer" name="ipmviewer" sandbox="allow-same-origin allow-scripts allow-popups allow-forms" src="http://localhost:8080/pdfserver/react.pdf" frameborder="0" marginheight="0" marginwidth="0" width="100%" height="100%" scrolling="auto" ></iframe> -->
 		
           
-		<!-- <object id = "pdffile" width="300" height="200"></object>   -->
-		<iframe id = "pdffile" width="300" height="200"></iframe>  
+		 <!-- <embed	 id = "pdffile" width="300" height="200"></embed>    -->
+		<embed id = "pdffile"  type="application/pdf" marginheight="0" marginwidth="0" width="100%" height="100%" scrolling="auto" fullscreen=yes></embed>
+		<!-- <object id="pdffile" ><p>This browser does not support PDFs.</p></object> -->
 		
 		
         </div>
