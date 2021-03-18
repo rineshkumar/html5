@@ -1,3 +1,69 @@
+<%@ page import="java.nio.charset.StandardCharsets,
+					java.security.MessageDigest,
+					java.security.NoSuchAlgorithmException,
+					java.util.Base64,
+					java.io.ByteArrayOutputStream,
+					java.io.FileNotFoundException,
+					java.io.IOException"					
+%>
+<%!
+public static String getDocumentHash(String filePath) {
+		String returnValue = "script-src 'self'";
+		return returnValue+" "+"'sha256-"+base64Encode(getPdfHash(filePath))+"'";
+	}
+	public static String base64Encode(String documentHash) {
+		return Base64.getEncoder().encodeToString(documentHash.getBytes());
+	}
+	public static String getDocumentDigest(String input ) {
+		String output="";
+		try {
+			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+			messageDigest.update(input.getBytes());
+			output = new String(messageDigest.digest());
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return output;
+	}		
+	public static String getPdfHash(String pdfFilePath) {
+		String output = "";
+		java.io.FileInputStream fileInputStream = null	;
+		try {
+			fileInputStream = getFileInputStream(pdfFilePath);
+			ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+			int nRead;
+			byte[] data = new byte[16384];
+
+			while ((nRead = fileInputStream.read(data, 0, data.length)) != -1) {
+			  buffer.write(data, 0, nRead);
+			}
+
+			 buffer.toByteArray();
+			
+			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+			messageDigest.update(buffer.toByteArray());
+			output = new String(messageDigest.digest());
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+
+		return output;
+	}
+	private static java.io.FileInputStream getFileInputStream(String pdfFilePath) throws FileNotFoundException {
+		java.io.FileInputStream fileInputStream;
+		fileInputStream=new java.io.FileInputStream(pdfFilePath);
+		return fileInputStream;
+	}
+%>
 <%
 	//Oracle WebCenter Content Server
 	//var contentInformation = hrefHost + "/cs/idcplg?IdcService=DOC_INFO_BY_NAME&dDocName=" + docID + "&IsJson=1";
@@ -11,11 +77,15 @@
 	//ICISTransferStream transferStream = fileAPI.getFile (context, documentID);
 		
 	response.setContentType("APPLICATION/pdf");
-	response.addHeader("Content-Security-Policy", "default-src 'self'");
-
+	//response.addHeader("Content-Security-Policy", "default-src 'self' ");
 	String filePath = "C:\\Users\\vivij\\Downloads\\apache-tomcat-9.0.44-windows-x64\\apache-tomcat-9.0.44\\webapps\\examples\\react.pdf";
+	//response.addHeader("Content-Security-Policy", getDocumentHash(filePath));
+	response.addHeader("Content-Security-Policy", "sandbox");
+
+	
 	//String filePath = ".//react.pdf";
 	java.io.FileInputStream fileInputStream=new java.io.FileInputStream(filePath);  
+	
 	java.io.OutputStream outStream = response.getOutputStream();
 	
 	byte[] buffer = new byte[4096];
