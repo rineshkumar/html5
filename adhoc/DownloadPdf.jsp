@@ -4,10 +4,34 @@
 					java.util.Base64,
 					java.io.ByteArrayOutputStream,
 					java.io.FileNotFoundException,
-					java.io.IOException"					
+					java.io.IOException,
+					java.io.InputStream,
+					org.apache.hc.client5.http.classic.methods.HttpGet,
+					org.apache.hc.client5.http.impl.classic.CloseableHttpClient,
+					org.apache.hc.client5.http.impl.classic.CloseableHttpResponse,
+					org.apache.hc.client5.http.impl.classic.HttpClientBuilder,
+					org.apache.hc.client5.http.impl.classic.HttpClients,
+					org.apache.hc.core5.http.HttpEntity"
 %>
 <%!
-public static String getDocumentHash(String filePath) {
+	public static InputStream getStream(String url) {
+		InputStream is = null;
+		HttpEntity entity = null;
+		try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+			HttpGet httpGet = new HttpGet("http://localhost:8080/examples/react.pdf");
+			try (CloseableHttpResponse response1 = httpclient.execute(httpGet)) {
+				System.out.println(response1.getCode() + " " + response1.getReasonPhrase());
+				//is = response1.getEntity().getContent();
+				is = response1.getEntity().getContent();
+			}
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return is;
+	}
+	public static String getDocumentHash(String filePath) {
 		String returnValue = "script-src 'self'";
 		return returnValue+" "+"'sha256-"+base64Encode(getPdfHash(filePath))+"'";
 	}
@@ -79,8 +103,8 @@ public static String getDocumentHash(String filePath) {
 	response.setContentType("APPLICATION/pdf");
 	//response.addHeader("Content-Security-Policy", "default-src 'self' ");
 	String filePath = "C:\\Users\\vivij\\Downloads\\apache-tomcat-9.0.44-windows-x64\\apache-tomcat-9.0.44\\webapps\\examples\\react.pdf";
-	//response.addHeader("Content-Security-Policy", getDocumentHash(filePath));
-	response.addHeader("Content-Security-Policy", "sandbox");
+	response.addHeader("Content-Security-Policy", getDocumentHash(filePath));
+	//response.addHeader("Content-Security-Policy", "sandbox");
 
 	
 	//String filePath = ".//react.pdf";
